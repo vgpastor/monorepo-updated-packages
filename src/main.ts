@@ -28,8 +28,13 @@ async function run(): Promise<void> {
         )
     }
 
-    const filesModified = await githubApi.getModifiedFiles(base, head)
-    core.info(`Files modified: ${filesModified}`)
+    // eslint-disable-next-line github/no-then
+    const filesModified = await githubApi
+      .getModifiedFiles(base, head)
+      .then(files => {
+        core.info(`Files modified: ${filesModified}`)
+        // return files
+      })
 
     // filesModified.then(files => {
     //   core.info(`Files modified: ${files}`)

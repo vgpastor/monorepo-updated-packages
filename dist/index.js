@@ -161,8 +161,11 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            const filesModified = yield githubApi.getModifiedFiles(base, head);
-            core.info(`Files modified: ${filesModified}`);
+            // eslint-disable-next-line github/no-then
+            const filesModified = yield githubApi.getModifiedFiles(base, head).then(files => {
+                core.info(`Files modified: ${filesModified}`);
+                // return files
+            });
             // filesModified.then(files => {
             //   core.info(`Files modified: ${files}`)
             // })
