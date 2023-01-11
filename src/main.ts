@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import GithubApi from './infrastructure/githubApi'
+import GithubApi from './infrastructure/githuba-api'
 
 async function run(): Promise<void> {
   try {
