@@ -32,7 +32,7 @@ async function run(): Promise<void> {
     const filesModified = await githubApi
       .getModifiedFiles(base, head)
       .then(files => {
-        core.info(`Files modified: ${filesModified}`)
+        core.info(`Files modified: ${files}`)
         // return files
       })
 

@@ -162,8 +162,10 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             // eslint-disable-next-line github/no-then
-            const filesModified = yield githubApi.getModifiedFiles(base, head).then(files => {
-                core.info(`Files modified: ${filesModified}`);
+            const filesModified = yield githubApi
+                .getModifiedFiles(base, head)
+                .then(files => {
+                core.info(`Files modified: ${files}`);
                 // return files
             });
             // filesModified.then(files => {
