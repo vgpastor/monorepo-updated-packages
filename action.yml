@@ -1,11 +1,24 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Monorepo packages updated'
+description: 'Detect packages updated in a monorepo app'
+author: 'Victor García Pastor'
 inputs:
-  milliseconds: # change this
+  token:
+    description: >
+      GitHub token for GitHub API requests.
+      Users shouldn't need to set this themselves.
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    default: ${{ github.token }}
+  folder:
+    description: >
+      Folder in which your packages are located.
+    required: true
+    default: apps
+
+outputs:
+  package:
+    description: >
+      Array of all packages updated.
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
