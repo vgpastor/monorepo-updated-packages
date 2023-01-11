@@ -28,11 +28,12 @@ async function run(): Promise<void> {
         )
     }
 
-    let filesModified = githubApi.getModifiedFiles(base, head)
+    const filesModified = await githubApi.getModifiedFiles(base, head)
+    core.info(`Files modified: ${filesModified}`)
 
-    filesModified.then(files => {
-      core.info(`Files modified: ${files}`)
-    })
+    // filesModified.then(files => {
+    //   core.info(`Files modified: ${files}`)
+    // })
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

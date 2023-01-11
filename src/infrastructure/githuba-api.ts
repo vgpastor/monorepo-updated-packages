@@ -7,6 +7,7 @@ export default class GithubApi {
     this.client = getOctokit(token)
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async getModifiedFiles(base: string, head: string) {
     // Debug log the payload.
     core.debug(`Payload keys: ${Object.keys(context.payload)}`)
@@ -32,8 +33,12 @@ export default class GithubApi {
         base,
         head
       })
+      // eslint-disable-next-line github/no-then
       .then(response => {
         core.debug(`Response: ${response}`)
+        core.debug(`Response data: ${response.data}`)
+        core.debug(`Response data files: ${response.data.files}`)
+        core.debug(`Response status: ${response.status}`)
 
         if (response.status !== 200) {
           core.setFailed(

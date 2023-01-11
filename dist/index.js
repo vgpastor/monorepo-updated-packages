@@ -42,6 +42,7 @@ class GithubApi {
         this.token = token;
         this.client = (0, github_1.getOctokit)(token);
     }
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     getModifiedFiles(base, head) {
         return __awaiter(this, void 0, void 0, function* () {
             // Debug log the payload.
@@ -63,8 +64,12 @@ class GithubApi {
                 base,
                 head
             })
+                // eslint-disable-next-line github/no-then
                 .then(response => {
                 core.debug(`Response: ${response}`);
+                core.debug(`Response data: ${response.data}`);
+                core.debug(`Response data files: ${response.data.files}`);
+                core.debug(`Response status: ${response.status}`);
                 if (response.status !== 200) {
                     core.setFailed(`The GitHub API for comparing the base and head commits for this ${github_1.context.eventName} event returned ${response.status}, expected 200. ` +
                         "Please submit an issue on this action's GitHub repo.");
@@ -156,10 +161,11 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            let filesModified = githubApi.getModifiedFiles(base, head);
-            filesModified.then(files => {
-                core.info(`Files modified: ${files}`);
-            });
+            const filesModified = yield githubApi.getModifiedFiles(base, head);
+            core.info(`Files modified: ${filesModified}`);
+            // filesModified.then(files => {
+            //   core.info(`Files modified: ${files}`)
+            // })
         }
         catch (error) {
             if (error instanceof Error)
