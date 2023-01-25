@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import GithubApi from './infrastructure/githuba-api'
 const {exec} = require('child_process')
 
 async function run(): Promise<void> {
@@ -8,9 +7,6 @@ async function run(): Promise<void> {
     core.info('Action runs')
     core.debug('Action runs DEBUG')
 
-    const githubApi = new GithubApi(core.getInput('token', {required: true}))
-
-    // Define the base and head commits to be extracted from the payload.
     let base = ''
     let head = ''
 
@@ -30,8 +26,7 @@ async function run(): Promise<void> {
         )
     }
 
-    // let files: string[] = []
-    const execResult = await exec(
+    exec(
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
@@ -45,28 +40,11 @@ async function run(): Promise<void> {
         core.info(`Files exec:\n ${stdout}`)
         const files = stdout.split('\n')
         const projects = extractProjectFromFiles(files)
-        core.info(`Projects: ${projects.join(', ')}`)
+        core.info(`Projects updated: ${projects.join(', ')}`)
         core.setOutput('projects', projects)
         return files
       }
     )
-
-    core.info(`Files captured: ${execResult.pid}`)
-
-    // Execute command in a child process
-    // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
-
-    // eslint-disable-next-line github/no-then
-    // const filesModified = await githubApi
-    //   .getModifiedFiles(base, head)
-    //   .then(files => {
-    //     core.info(`Files modified: ${files}`)
-    //     // return files
-    //   })
-
-    // filesModified.then(files => {
-    //   core.info(`Files modified: ${files}`)
-    // })
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
