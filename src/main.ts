@@ -10,6 +10,7 @@ async function run(): Promise<void> {
     let base = ''
     let head = ''
 
+    core.info('Action runs ${context.eventName}')
     switch (context.eventName) {
       case 'pull_request':
         base = context.payload.pull_request?.base?.sha
@@ -30,11 +31,11 @@ async function run(): Promise<void> {
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
-          core.error(`error: ${error.message}`)
+          core.error(`exec error: ${error.message}`)
           return
         }
         if (stderr) {
-          core.error(`stderr: ${stderr}`)
+          core.error(`exec stderr: ${stderr}`)
           return
         }
         core.info(`Files exec:\n ${stdout}`)
