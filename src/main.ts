@@ -54,13 +54,6 @@ function extractProjectFromFiles(files: string[]): string[] {
   const projects: string[] = []
   const folder = core.getInput('folder', {required: true})
 
-  // files.forEach(file => {
-  //   const paths = file.split('/')
-  //   if (paths[0] === folder) {
-  //     projects.push(paths[1])
-  //   }
-  // })
-
   for (let i = 0; i < files.length; i++) {
     const paths = files[i].split('/')
     if (paths[0] === folder) {
