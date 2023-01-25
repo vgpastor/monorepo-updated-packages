@@ -5,9 +5,8 @@ const {exec} = require('child_process')
 
 async function run(): Promise<void> {
   try {
-    core.debug('Action runs')
-    core.info('Action runs INFO')
-    core.error('Action runs ERROR')
+    core.info('Action runs')
+    core.debug('Action runs DEBUG')
     const folder = core.getInput('folder', {required: true})
 
     const githubApi = new GithubApi(core.getInput('token', {required: true}))
@@ -32,20 +31,24 @@ async function run(): Promise<void> {
         )
     }
 
+    let files: string[] = []
     exec(
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
-          console.log(`error: ${error.message}`)
+          core.error(`error: ${error.message}`)
           return
         }
         if (stderr) {
-          console.log(`stderr: ${stderr}`)
+          core.error(`stderr: ${stderr}`)
           return
         }
-        console.log(`stdout: ${stdout}`)
+        core.info(`stdout: ${stdout}`)
+        files = stdout.split('\n')
       }
     )
+
+    core.info(`Files captured: ${files}`)
 
     // Execute command in a child process
     // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
