@@ -151,7 +151,6 @@ function run() {
         try {
             core.info('Action runs');
             core.debug('Action runs DEBUG');
-            const folder = core.getInput('folder', { required: true });
             const githubApi = new githuba_api_1.default(core.getInput('token', { required: true }));
             // Define the base and head commits to be extracted from the payload.
             let base = '';
@@ -170,7 +169,7 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             // let files: string[] = []
-            let files = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
+            let execResult = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`error: ${error.message}`);
                     return;
@@ -179,19 +178,14 @@ function run() {
                     core.error(`stderr: ${stderr}`);
                     return;
                 }
-                core.info(`stdout: ${stdout}`);
-                files = stdout.split('\n');
+                core.info(`Files exec:\n ${stdout}`);
+                const files = stdout.split('\n');
+                const projects = extractProjectFromFiles(files);
+                core.info(`Projects: ${projects.join(', ')}`);
+                core.setOutput('projects', projects);
                 return files;
             });
-            core.info(`Files captured: ${files}`);
-            //extract folder of files
-            files.forEach((file) => {
-                core.info(`File: ${file}`);
-                var paths = file.split('/');
-                if (paths[0] === folder) {
-                    core.info(`Project found: ${paths[1]}`);
-                }
-            });
+            core.info(`Files captured: ${execResult.join('--')}`);
             // Execute command in a child process
             // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
             // eslint-disable-next-line github/no-then
@@ -210,6 +204,17 @@ function run() {
                 core.setFailed(error.message);
         }
     });
+}
+function extractProjectFromFiles(files) {
+    const projects = [];
+    const folder = core.getInput('folder', { required: true });
+    files.forEach(file => {
+        const paths = file.split('/');
+        if (paths[0] === folder) {
+            projects.push(paths[1]);
+        }
+    });
+    return projects;
 }
 run();
 

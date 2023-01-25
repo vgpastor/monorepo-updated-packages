@@ -7,7 +7,6 @@ async function run(): Promise<void> {
   try {
     core.info('Action runs')
     core.debug('Action runs DEBUG')
-    const folder = core.getInput('folder', {required: true})
 
     const githubApi = new GithubApi(core.getInput('token', {required: true}))
 
@@ -32,7 +31,7 @@ async function run(): Promise<void> {
     }
 
     // let files: string[] = []
-    let files = await exec(
+    let execResult = await exec(
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
@@ -43,22 +42,16 @@ async function run(): Promise<void> {
           core.error(`stderr: ${stderr}`)
           return
         }
-        core.info(`stdout: ${stdout}`)
-        files = stdout.split('\n')
+        core.info(`Files exec:\n ${stdout}`)
+        const files = stdout.split('\n')
+        const projects = extractProjectFromFiles(files)
+        core.info(`Projects: ${projects.join(', ')}`)
+        core.setOutput('projects', projects)
         return files
       }
     )
 
-    core.info(`Files captured: ${files}`)
-
-    //extract folder of files
-    files.forEach((file: string) => {
-      core.info(`File: ${file}`)
-      var paths = file.split('/')
-      if (paths[0] === folder) {
-        core.info(`Project found: ${paths[1]}`)
-      }
-    })
+    core.info(`Files captured: ${execResult.join('--')}`)
 
     // Execute command in a child process
     // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
@@ -77,6 +70,19 @@ async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
+}
+
+function extractProjectFromFiles(files: string[]): string[] {
+  const projects: string[] = []
+  const folder = core.getInput('folder', {required: true})
+
+  files.forEach(file => {
+    const paths = file.split('/')
+    if (paths[0] === folder) {
+      projects.push(paths[1])
+    }
+  })
+  return projects
 }
 
 run()
