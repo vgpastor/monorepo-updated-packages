@@ -75,7 +75,7 @@ function run() {
                 const files = stdout.split('\n');
                 const projects = extractProjectFromFiles(files);
                 core.info(`packages updated: ${projects.join(', ')}`);
-                core.setOutput('packages', projects);
+                core.setOutput('packages', JSON.stringify(projects));
                 return files;
             });
             core.info(`PID ${eRes.pid}`);

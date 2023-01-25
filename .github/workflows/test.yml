@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value: ${{needs.monolito-packages.outputs.packages}}
+        value: ${{ fromJson(needs.monolito-packages.outputs.packages)}}
     steps:
       - run: |
           echo "${{ matrix.value }}"
