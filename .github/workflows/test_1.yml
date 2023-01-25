@@ -28,4 +28,5 @@ jobs:
             echo ${{ steps.arr.outputs.arr }}
       - uses: ./
         with:
-        # input params if you have any
+            token: ${{ secrets.GITHUB_TOKEN }}
+            folder: ${{ steps.arr.outputs.arr }}
