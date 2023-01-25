@@ -10,7 +10,7 @@ async function run(): Promise<void> {
     let base = ''
     let head = ''
 
-    core.info('Action runs ${context.eventName}')
+    core.info(`Action runs ${context.eventName}`)
     switch (context.eventName) {
       case 'pull_request':
         base = context.payload.pull_request?.base?.sha
@@ -32,11 +32,11 @@ async function run(): Promise<void> {
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
           core.error(`exec error: ${error.message}`)
-          return
+          core.endGroup()
         }
         if (stderr) {
           core.error(`exec stderr: ${stderr}`)
-          return
+          core.endGroup()
         }
         core.info(`Files exec:\n ${stdout}`)
         const files = stdout.split('\n')

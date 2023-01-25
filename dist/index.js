@@ -46,7 +46,7 @@ function run() {
             core.debug('Action runs DEBUG');
             let base = '';
             let head = '';
-            core.info('Action runs ${context.eventName}');
+            core.info(`Action runs ${github_1.context.eventName}`);
             switch (github_1.context.eventName) {
                 case 'pull_request':
                     base = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha;
@@ -63,11 +63,11 @@ function run() {
             const eRes = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`exec error: ${error.message}`);
-                    return;
+                    core.endGroup();
                 }
                 if (stderr) {
                     core.error(`exec stderr: ${stderr}`);
-                    return;
+                    core.endGroup();
                 }
                 core.info(`Files exec:\n ${stdout}`);
                 const files = stdout.split('\n');
