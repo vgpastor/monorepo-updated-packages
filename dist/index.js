@@ -63,11 +63,13 @@ function run() {
             const eRes = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`exec error: ${error.message}`);
-                    core.endGroup();
+                    core.setFailed(`exec error: ${error.message}`);
+                    return;
                 }
                 if (stderr) {
                     core.error(`exec stderr: ${stderr}`);
-                    core.endGroup();
+                    core.setFailed(`exec stderr: ${stderr}`);
+                    return;
                 }
                 core.info(`Files exec:\n ${stdout}`);
                 const files = stdout.split('\n');
