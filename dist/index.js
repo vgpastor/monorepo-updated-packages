@@ -184,6 +184,14 @@ function run() {
                 return files;
             });
             core.info(`Files captured: ${files}`);
+            //extract folder of files
+            files.each((file) => {
+                core.info(`File: ${file}`);
+                var paths = file.split('/');
+                if (paths[0] === folder) {
+                    core.info(`Project found: ${paths[1]}`);
+                }
+            });
             // Execute command in a child process
             // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
             // eslint-disable-next-line github/no-then
