@@ -1,0 +1,26 @@
+name: 'build-test'
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      # This step will create "an array" of strings, e.g. "path1 path2 path3"
+      - name: array
+        id: arr
+        run: |
+          arr=()
+          for i in "$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})"
+          do
+            if [[ $i == *"path1"* ]]; then
+              arr+=("path1")
+            fi
+            if [[ $i == *"path2"* ]]; then
+              arr+=("path2")
+            fi
+          done
+          echo ::set-output name=arr::${arr[@]}
