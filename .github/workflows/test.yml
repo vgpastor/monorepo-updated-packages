@@ -25,3 +25,27 @@ jobs:
           folder: sourceTest
       - run: |
           echo ${{ steps.monorepo.outputs.packages }}
+      - name: 'Run if project 1 updated'
+        if: ${{ contains(steps.monorepo.outputs.packages, 'project1') }}
+        run: |
+          echo 'project1 updated'
+
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - id: monolito-packages
+        uses: ./
+        with:
+          folder: sourceTest
+  exec:
+    needs: [ setup ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        value: ${{needs.monolito-packages.outputs.packages}}
+    steps:
+      - run: |
+          echo "${{ matrix.value }}"
+        
