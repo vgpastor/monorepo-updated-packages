@@ -26,7 +26,7 @@ async function run(): Promise<void> {
         )
     }
 
-    exec(
+    await exec(
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {

@@ -59,7 +59,7 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
+            yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`error: ${error.message}`);
                     return;
@@ -85,12 +85,6 @@ function run() {
 function extractProjectFromFiles(files) {
     const projects = [];
     const folder = core.getInput('folder', { required: true });
-    // files.forEach(file => {
-    //   const paths = file.split('/')
-    //   if (paths[0] === folder) {
-    //     projects.push(paths[1])
-    //   }
-    // })
     for (let i = 0; i < files.length; i++) {
         const paths = files[i].split('/');
         if (paths[0] === folder) {
