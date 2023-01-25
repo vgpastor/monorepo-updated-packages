@@ -20,8 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: ./
-        name: monorepo
+        id: monorepo
         with:
           folder: sourceTest
       - run: |
-          echo ${{ steps.monorepo.outputs.packages }}
+          echo ${{ jobs.test.steps.monorepo.outputs.packages }}
