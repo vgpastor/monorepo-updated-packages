@@ -1,4 +1,4 @@
-name: 'build-test'
+name: 'Test pipeline'
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
@@ -16,6 +16,7 @@ jobs:
           arr=()
           for i in "$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})"
           do
+          echo i
             if [[ $i == *"path1"* ]]; then
               arr+=("path1")
             fi
@@ -24,3 +25,7 @@ jobs:
             fi
           done
           echo ::set-output name=arr::${arr[@]}
+            echo ${{ steps.arr.outputs.arr }}
+      - uses: ./
+        with:
+        # input params if you have any
