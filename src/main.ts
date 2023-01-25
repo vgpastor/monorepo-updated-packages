@@ -26,7 +26,7 @@ async function run(): Promise<void> {
         )
     }
 
-    await exec(
+    const eRes = await exec(
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
@@ -45,6 +45,9 @@ async function run(): Promise<void> {
         return files
       }
     )
+    core.info(`PID ${eRes.pid}`)
+    core.info(`Status ${eRes.status}`)
+    core.info(`Signal ${eRes.signal}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

@@ -59,7 +59,7 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
+            const eRes = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`error: ${error.message}`);
                     return;
@@ -75,6 +75,9 @@ function run() {
                 core.setOutput('projects', projects);
                 return files;
             });
+            core.info(`PID ${eRes.pid}`);
+            core.info(`Status ${eRes.status}`);
+            core.info(`Signal ${eRes.signal}`);
         }
         catch (error) {
             if (error instanceof Error)
