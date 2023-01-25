@@ -2,12 +2,6 @@ name: 'Monorepo packages updated'
 description: 'Detect packages updated in a monorepo app'
 author: 'Victor García Pastor'
 inputs:
-  token:
-    description: >
-      GitHub token for GitHub API requests.
-      Users shouldn't need to set this themselves.
-    required: true
-    default: ${{ github.token }}
   folder:
     description: >
       Folder in which your packages are located.
