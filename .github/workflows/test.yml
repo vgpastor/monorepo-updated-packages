@@ -24,4 +24,4 @@ jobs:
         with:
           folder: sourceTest
       - run: |
-          echo ${{ jobs.test.steps.monorepo.outputs.packages }}
+          echo ${{ steps.monorepo.outputs.packages }}
