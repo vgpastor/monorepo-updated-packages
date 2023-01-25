@@ -52,7 +52,7 @@ async function run(): Promise<void> {
     core.info(`Files captured: ${files}`)
 
     //extract folder of files
-    files.each((file: string) => {
+    files.forEach((file: string) => {
       core.info(`File: ${file}`)
       var paths = file.split('/')
       if (paths[0] === folder) {

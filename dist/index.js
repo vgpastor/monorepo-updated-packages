@@ -185,7 +185,7 @@ function run() {
             });
             core.info(`Files captured: ${files}`);
             //extract folder of files
-            files.each((file) => {
+            files.forEach((file) => {
                 core.info(`File: ${file}`);
                 var paths = file.split('/');
                 if (paths[0] === folder) {
