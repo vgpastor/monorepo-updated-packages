@@ -35,6 +35,7 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.value }}
     steps:
+      - uses: actions/checkout@v1
       - id: monolito-packages
         uses: ./
         with:
