@@ -144,10 +144,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const githuba_api_1 = __importDefault(__nccwpck_require__(8476));
+const { exec } = __nccwpck_require__(3129);
 function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            core.debug("Action runs");
+            core.info("Action runs INFO");
+            core.error("Action runs ERROR");
             const folder = core.getInput('folder', { required: true });
             const githubApi = new githuba_api_1.default(core.getInput('token', { required: true }));
             // Define the base and head commits to be extracted from the payload.
@@ -166,13 +170,26 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            // eslint-disable-next-line github/no-then
-            const filesModified = yield githubApi
-                .getModifiedFiles(base, head)
-                .then(files => {
-                core.info(`Files modified: ${files}`);
-                // return files
+            exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.log(`stderr: ${stderr}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
             });
+            // Execute command in a child process
+            // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
+            // eslint-disable-next-line github/no-then
+            // const filesModified = await githubApi
+            //   .getModifiedFiles(base, head)
+            //   .then(files => {
+            //     core.info(`Files modified: ${files}`)
+            //     // return files
+            //   })
             // filesModified.then(files => {
             //   core.info(`Files modified: ${files}`)
             // })
@@ -9715,6 +9732,14 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 
 "use strict";
 module.exports = require("assert");
+
+/***/ }),
+
+/***/ 3129:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
 
 /***/ }),
 
