@@ -169,7 +169,7 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             // let files: string[] = []
-            let execResult = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
+            const execResult = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`error: ${error.message}`);
                     return;
@@ -185,7 +185,7 @@ function run() {
                 core.setOutput('projects', projects);
                 return files;
             });
-            core.info(`Files captured: ${execResult.join('--')}`);
+            core.info(`Files captured: ${execResult.pid}`);
             // Execute command in a child process
             // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
             // eslint-disable-next-line github/no-then
@@ -208,12 +208,18 @@ function run() {
 function extractProjectFromFiles(files) {
     const projects = [];
     const folder = core.getInput('folder', { required: true });
-    files.forEach(file => {
-        const paths = file.split('/');
+    // files.forEach(file => {
+    //   const paths = file.split('/')
+    //   if (paths[0] === folder) {
+    //     projects.push(paths[1])
+    //   }
+    // })
+    for (let i = 0; i < files.length; i++) {
+        const paths = files[i].split('/');
         if (paths[0] === folder) {
             projects.push(paths[1]);
         }
-    });
+    }
     return projects;
 }
 run();

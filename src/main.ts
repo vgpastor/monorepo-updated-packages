@@ -31,7 +31,7 @@ async function run(): Promise<void> {
     }
 
     // let files: string[] = []
-    let execResult = await exec(
+    const execResult = await exec(
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
@@ -51,7 +51,7 @@ async function run(): Promise<void> {
       }
     )
 
-    core.info(`Files captured: ${execResult.join('--')}`)
+    core.info(`Files captured: ${execResult.pid}`)
 
     // Execute command in a child process
     // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
@@ -76,12 +76,19 @@ function extractProjectFromFiles(files: string[]): string[] {
   const projects: string[] = []
   const folder = core.getInput('folder', {required: true})
 
-  files.forEach(file => {
-    const paths = file.split('/')
+  // files.forEach(file => {
+  //   const paths = file.split('/')
+  //   if (paths[0] === folder) {
+  //     projects.push(paths[1])
+  //   }
+  // })
+
+  for (let i = 0; i < files.length; i++) {
+    const paths = files[i].split('/')
     if (paths[0] === folder) {
       projects.push(paths[1])
     }
-  })
+  }
   return projects
 }
 
