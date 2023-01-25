@@ -5,6 +5,9 @@ const { exec } = require("child_process");
 
 async function run(): Promise<void> {
   try {
+      console.log("Action runs");
+      console.info("Action runs INFO");
+        console.error("Action runs ERROR");
     const folder = core.getInput('folder', {required: true})
 
     const githubApi = new GithubApi(core.getInput('token', {required: true}))
