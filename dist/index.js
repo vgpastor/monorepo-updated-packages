@@ -169,8 +169,8 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            let files = [];
-            exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
+            // let files: string[] = []
+            let files = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`error: ${error.message}`);
                     return;
@@ -181,6 +181,7 @@ function run() {
                 }
                 core.info(`stdout: ${stdout}`);
                 files = stdout.split('\n');
+                return files;
             });
             core.info(`Files captured: ${files}`);
             // Execute command in a child process

@@ -31,8 +31,8 @@ async function run(): Promise<void> {
         )
     }
 
-    let files: string[] = []
-    exec(
+    // let files: string[] = []
+    let files = await exec(
       `git diff --name-only ${base} ${head}`,
       (error: {message: any}, stdout: any, stderr: any) => {
         if (error) {
@@ -45,6 +45,7 @@ async function run(): Promise<void> {
         }
         core.info(`stdout: ${stdout}`)
         files = stdout.split('\n')
+        return files
       }
     )
 
