@@ -16,7 +16,7 @@ jobs:
           arr=()
           for i in "$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})"
           do
-          echo i
+          echo $i
             if [[ $i == *"path1"* ]]; then
               arr+=("path1")
             fi
@@ -29,4 +29,4 @@ jobs:
       - uses: ./
         with:
             token: ${{ secrets.GITHUB_TOKEN }}
-            folder: ${{ steps.arr.outputs.arr }}
+            folder: sourceTest
