@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
 import GithubApi from './infrastructure/githuba-api'
-const { exec } = require("child_process");
 
 async function run(): Promise<void> {
   try {
@@ -29,30 +28,13 @@ async function run(): Promise<void> {
         )
     }
 
-    exec(`git diff --name-only ${base} ${head}`, (error: { message: any; }, stdout: any, stderr: any) => {
-        if (error) {
-            console.log(`error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`stderr: ${stderr}`);
-            return;
-        }
-        console.log(`stdout: ${stdout}`);
-    });
-
-    // Execute command in a child process
-    // const { stdout, stderr } = await exec('git diff --name-only ${base} ${head}');
-
-
-
     // eslint-disable-next-line github/no-then
-    // const filesModified = await githubApi
-    //   .getModifiedFiles(base, head)
-    //   .then(files => {
-    //     core.info(`Files modified: ${files}`)
-    //     // return files
-    //   })
+    const filesModified = await githubApi
+      .getModifiedFiles(base, head)
+      .then(files => {
+        core.info(`Files modified: ${files}`)
+        // return files
+      })
 
     // filesModified.then(files => {
     //   core.info(`Files modified: ${files}`)
