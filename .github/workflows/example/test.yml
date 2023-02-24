@@ -1,4 +1,4 @@
-name: 'Test projects'
+name: 'EXAMPLE Test projects'
 on:
   workflow_dispatch:
     inputs:

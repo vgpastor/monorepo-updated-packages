@@ -1,4 +1,4 @@
-name: 'Orchest test fo modified project'
+name: 'EXAMPLE Orchest test fo modified project'
 on:
   pull_request:
   push:
