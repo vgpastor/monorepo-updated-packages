@@ -18,11 +18,9 @@ jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: ./
-        id: monorepo
-        with:
-          folder: sourceTest
+      - uses: actions/checkout@v3
+      - run: |
+          npm install
       - run: |
           echo ${{ steps.monorepo.outputs.packages }}
       - name: 'Run if project 1 updated'
@@ -35,7 +33,7 @@ jobs:
     outputs:
       packages: ${{ steps.monolito-packages.outputs.packages }}
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - id: monolito-packages
         uses: ./
         with:
@@ -49,4 +47,3 @@ jobs:
     steps:
       - run: |
           echo "${{ matrix.value }}"
-        
