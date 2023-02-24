@@ -16,7 +16,7 @@ jobs:
       - id: monorepo-packages
         uses: ./ # vgpastor/monorepo-updated-packages
         with:
-          folder: apps
+          folder: example/sourceTest
   exec:
     needs: [ setup ]
     runs-on: ubuntu-latest
