@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
-import {ExecException, exec} from 'child_process'
 import {context} from '@actions/github'
-
+import {simpleGit} from 'simple-git'
 async function run(): Promise<void> {
   try {
     core.info('Action runs')
@@ -27,46 +26,44 @@ async function run(): Promise<void> {
         )
     }
 
-    const eRes = exec(
-      `git diff --name-only ${base} ${head}`,
-      (error: ExecException | null, stdout: string, stderr: string) => {
-        if (error) {
-          core.error(`exec error: ${error.message}`)
-          core.setFailed(`exec error: ${error.message}`)
-          return
-        }
-        if (stderr) {
-          core.error(`exec stderr: ${stderr}`)
-          core.setFailed(`exec stderr: ${stderr}`)
-          return
-        }
-        core.info(`Files exec:\n ${stdout}`)
-        const files = stdout.split('\n')
-        const projects = extractProjectFromFiles(files)
-        core.info(`packages updated: ${projects.join(', ')}`)
-        core.setOutput('packages', JSON.stringify(projects))
-        return files
-      }
-    )
-    core.info(`PID ${eRes.pid}`)
+    const out = await simpleGit().diffSummary(['--name-only', base, head])
+    core.info(`files updated: ${out.changed}`)
+    core.setOutput('packages', JSON.stringify(out.files))
+
+    return
+    // core.info(`Files exec:\n ${out}`)
+    // const files = out.split('\n')
+    // const projects = extractProjectFromFiles(files)
+    // core.info(`packages updated: ${projects.join(', ')}`)
+    // core.setOutput('packages', JSON.stringify(projects))
+    // return files
+
+    // const eRes = exec(
+    //   `git diff --name-only ${base} ${head}`,
+    //   (error: ExecException | null, stdout: string, stderr: string) => {
+    //     if (error) {
+    //       core.error(`exec error: ${error.message}`)
+    //       core.setFailed(`exec error: ${error.message}`)
+    //       return
+    //     }
+    //     if (stderr) {
+    //       core.error(`exec stderr: ${stderr}`)
+    //       core.setFailed(`exec stderr: ${stderr}`)
+    //       return
+    //     }
+    //     core.info(`Files exec:\n ${stdout}`)
+    //     const files = stdout.split('\n')
+    //     const projects = extractProjectFromFiles(files)
+    //     core.info(`packages updated: ${projects.join(', ')}`)
+    //     core.setOutput('packages', JSON.stringify(projects))
+    //     return files
+    //   }
+    // )
+    // core.info(`PID ${eRes.pid}`)
     // core.info(`Status ${eRes.s}`)
-    core.info(`Signal ${eRes.signalCode}`)
+    // core.info(`Signal ${eRes.signalCode}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
-
-function extractProjectFromFiles(files: string[]): string[] {
-  const projects: string[] = []
-  const folder = core.getInput('folder', {required: true})
-
-  for (const file of files) {
-    const paths = file.split('/')
-    if (paths[0] === folder) {
-      projects.push(paths[1])
-    }
-  }
-  return projects
-}
-
 run()
