@@ -36,8 +36,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
+const child_process_1 = __nccwpck_require__(3129);
 const github_1 = __nccwpck_require__(5438);
-const { exec } = __nccwpck_require__(3129);
 function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
@@ -60,7 +60,7 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            const eRes = yield exec(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
+            const eRes = (0, child_process_1.exec)(`git diff --name-only ${base} ${head}`, (error, stdout, stderr) => {
                 if (error) {
                     core.error(`exec error: ${error.message}`);
                     core.setFailed(`exec error: ${error.message}`);
@@ -79,8 +79,8 @@ function run() {
                 return files;
             });
             core.info(`PID ${eRes.pid}`);
-            core.info(`Status ${eRes.status}`);
-            core.info(`Signal ${eRes.signal}`);
+            // core.info(`Status ${eRes.s}`)
+            core.info(`Signal ${eRes.signalCode}`);
         }
         catch (error) {
             if (error instanceof Error)
@@ -91,8 +91,8 @@ function run() {
 function extractProjectFromFiles(files) {
     const projects = [];
     const folder = core.getInput('folder', { required: true });
-    for (let i = 0; i < files.length; i++) {
-        const paths = files[i].split('/');
+    for (const file of files) {
+        const paths = file.split('/');
         if (paths[0] === folder) {
             projects.push(paths[1]);
         }

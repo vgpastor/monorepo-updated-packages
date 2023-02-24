@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
+import {ExecException, exec} from 'child_process'
 import {context} from '@actions/github'
-const {exec} = require('child_process')
 
 async function run(): Promise<void> {
   try {
@@ -27,9 +27,9 @@ async function run(): Promise<void> {
         )
     }
 
-    const eRes = await exec(
+    const eRes = exec(
       `git diff --name-only ${base} ${head}`,
-      (error: {message: any}, stdout: any, stderr: any) => {
+      (error: ExecException | null, stdout: string, stderr: string) => {
         if (error) {
           core.error(`exec error: ${error.message}`)
           core.setFailed(`exec error: ${error.message}`)
@@ -49,8 +49,8 @@ async function run(): Promise<void> {
       }
     )
     core.info(`PID ${eRes.pid}`)
-    core.info(`Status ${eRes.status}`)
-    core.info(`Signal ${eRes.signal}`)
+    // core.info(`Status ${eRes.s}`)
+    core.info(`Signal ${eRes.signalCode}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
@@ -60,8 +60,8 @@ function extractProjectFromFiles(files: string[]): string[] {
   const projects: string[] = []
   const folder = core.getInput('folder', {required: true})
 
-  for (let i = 0; i < files.length; i++) {
-    const paths = files[i].split('/')
+  for (const file of files) {
+    const paths = file.split('/')
     if (paths[0] === folder) {
       projects.push(paths[1])
     }

@@ -7,43 +7,18 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-#  build: # make sure build/ci work properly
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - run: |
-#          npm install
-#      - run: |
-#          npm run all
-  test: # make sure the action works on a clean machine without building
+  build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: |
           npm install
       - run: |
-          echo ${{ steps.monorepo.outputs.packages }}
-      - name: 'Run if project 1 updated'
-        if: ${{ contains(steps.monorepo.outputs.packages, 'project1') }}
-        run: |
-          echo 'project1 updated'
-
-  setup:
+          npm run all
+  test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
-    outputs:
-      packages: ${{ steps.monolito-packages.outputs.packages }}
     steps:
       - uses: actions/checkout@v3
-      - id: monolito-packages
-        uses: ./
+      - uses: ./
         with:
-          folder: sourceTest
-  exec:
-    needs: [ setup ]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        value: ${{ fromJson(needs.setup.outputs.packages)}}
-    steps:
-      - run: |
-          echo "${{ matrix.value }}"
+          milliseconds: 1000

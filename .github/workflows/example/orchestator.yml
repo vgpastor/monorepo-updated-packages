@@ -1,0 +1,31 @@
+name: 'Orchest test fo modified project'
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.monorepo-packages.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: monorepo-packages
+        uses: vgpastor/monorepo-updated-packages@test
+        with:
+          folder: apps
+  exec:
+    needs: [ setup ]
+    runs-on: ubuntu-latest
+    if: ${{ needs.setup.outputs.packages != '' }}
+    strategy:
+      matrix:
+        value: ${{ fromJson(needs.setup.outputs.packages)}}
+    steps:
+    - uses: ./.github/workflows/test.yml
+      with:
+        app: ${{ matrix.value }}
+
