@@ -64,6 +64,9 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
+            core.info(`Base: ${base}`);
+            core.info(`Head: ${head}`);
+            core.info(`diff: ` + base + '->' + head);
             const out = yield (0, simple_git_1.simpleGit)().diffSummary(['--name-only', base, head]);
             core.info(`files updated: ${out.changed}`);
             core.setOutput('packages', JSON.stringify(out.files));

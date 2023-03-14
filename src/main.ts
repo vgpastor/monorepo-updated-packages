@@ -25,6 +25,10 @@ async function run(): Promise<void> {
             "Please submit an issue on this action's GitHub repo if you believe this in correct."
         )
     }
+    core.info(`Base: ${base}`)
+    core.info(`Head: ${head}`)
+
+    core.info(`diff: `+base+'->'+head);
 
     const out = await simpleGit().diffSummary(['--name-only', base, head])
     core.info(`files updated: ${out.changed}`)
