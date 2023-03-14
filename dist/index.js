@@ -1,6 +1,61 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 3415:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GitClient = void 0;
+const simple_git_1 = __nccwpck_require__(9103);
+class GitClient {
+    constructor() {
+        this.path = process.cwd();
+        const options = {
+            baseDir: this.path,
+            binary: 'git',
+            maxConcurrentProcesses: 6,
+            trimmed: false,
+            // config:['safe.directory='+path]
+        };
+        this.git = (0, simple_git_1.simpleGit)(options);
+        this.enableSecurePath();
+    }
+    enableSecurePath() {
+        const commands = ['config', '--global', '--add', 'safe.directory', this.path];
+        this.git.raw(commands, (err, result) => {
+            // console.log(result)
+        });
+    }
+    getDiff(base, head) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const out = yield this.git.diffSummary(['--name-only', base, head]);
+            return this.flatOutputDiff(out);
+        });
+    }
+    flatOutputDiff(result) {
+        var listOfFiles = [];
+        for (const file of result.files) {
+            listOfFiles.push(file.file);
+        }
+        return listOfFiles;
+    }
+}
+exports.GitClient = GitClient;
+
+
+/***/ }),
+
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -41,7 +96,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
-const simple_git_1 = __nccwpck_require__(9103);
+const GitClient_1 = __nccwpck_require__(3415);
 function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
@@ -65,48 +120,43 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             core.info(`Base: ${base}`);
+            base = "0cf252834ca881794e6ce24e4bd803df6c973d0b";
             core.info(`Head: ${head}`);
+            head = "8ef64a7929361e120f278be6ff34460d0ca3bb92";
             core.info(`diff: ` + base + '->' + head);
-            const out = yield (0, simple_git_1.simpleGit)().diffSummary(['--name-only', base, head]);
-            core.info(`files updated: ${out.changed}`);
-            core.setOutput('packages', JSON.stringify(out.files));
+            const git = new GitClient_1.GitClient();
+            const listOfFilesUpdated = yield git.getDiff(base, head);
+            core.info(`files updated: ${listOfFilesUpdated.length}`);
+            for (const file of listOfFilesUpdated) {
+                core.debug(`file updated: ${file}`);
+            }
+            // var projectsPath = core.getInput('folder', {required: true, trimWhitespace: true})
+            var projectsPath = cleanProjectsPathEndSlash("example/sourceTest/");
+            core.info(`projectsPath: ${projectsPath}`);
+            core.setOutput('packages', JSON.stringify(extractProjectFromFiles(projectsPath, listOfFilesUpdated)));
             return;
-            // core.info(`Files exec:\n ${out}`)
-            // const files = out.split('\n')
-            // const projects = extractProjectFromFiles(files)
-            // core.info(`packages updated: ${projects.join(', ')}`)
-            // core.setOutput('packages', JSON.stringify(projects))
-            // return files
-            // const eRes = exec(
-            //   `git diff --name-only ${base} ${head}`,
-            //   (error: ExecException | null, stdout: string, stderr: string) => {
-            //     if (error) {
-            //       core.error(`exec error: ${error.message}`)
-            //       core.setFailed(`exec error: ${error.message}`)
-            //       return
-            //     }
-            //     if (stderr) {
-            //       core.error(`exec stderr: ${stderr}`)
-            //       core.setFailed(`exec stderr: ${stderr}`)
-            //       return
-            //     }
-            //     core.info(`Files exec:\n ${stdout}`)
-            //     const files = stdout.split('\n')
-            //     const projects = extractProjectFromFiles(files)
-            //     core.info(`packages updated: ${projects.join(', ')}`)
-            //     core.setOutput('packages', JSON.stringify(projects))
-            //     return files
-            //   }
-            // )
-            // core.info(`PID ${eRes.pid}`)
-            // core.info(`Status ${eRes.s}`)
-            // core.info(`Signal ${eRes.signalCode}`)
         }
         catch (error) {
             if (error instanceof Error)
                 core.setFailed(error.message);
         }
     });
+}
+function extractProjectFromFiles(pathToProjects, listOfFiles) {
+    const projects = new Set();
+    for (const file of listOfFiles) {
+        if (!file.startsWith(pathToProjects)) {
+            continue;
+        }
+        var route = file.replace(pathToProjects, '');
+        core.info(`route: ${route}`);
+        const project = route.split('/')[0];
+        projects.add(project);
+    }
+    return Array.from(projects);
+}
+function cleanProjectsPathEndSlash(path) {
+    return path.endsWith('/') ? path : path + '/';
 }
 run();
 

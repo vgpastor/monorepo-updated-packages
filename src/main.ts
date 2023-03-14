@@ -1,26 +1,8 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import { simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
-
-const options: Partial<SimpleGitOptions> = {
-  baseDir: process.cwd(),
-  binary: 'git',
-  maxConcurrentProcesses: 6,
-  trimmed: false,
-  config:['safe.directory='+process.cwd()]
-};
-
-const git: SimpleGit = simpleGit(options);
-const commands = ['config', '--global', '--add', 'safe.directory', process.cwd()];
-
-// using an array of commands and node-style callback
-git.raw(commands, (err, result) => {
-  // console.log(result)
-});
-
+import {GitClient} from "./GitClient";
 async function run(): Promise<void> {
   try {
-    const cwd = process.cwd();
     core.info('Action runs')
     core.debug('Action runs DEBUG')
 
@@ -43,62 +25,41 @@ async function run(): Promise<void> {
             "Please submit an issue on this action's GitHub repo if you believe this in correct."
         )
     }
-    core.info(`Base: ${base}`)
-    base = "0cf252834ca881794e6ce24e4bd803df6c973d0b"
-    core.info(`Head: ${head}`)
-    head = "8ef64a7929361e120f278be6ff34460d0ca3bb92"
 
-    // git.status()
-    //     .then((status) => {
-    //       console.log(status)
-    //     })
-    //     .catch((err) => {
-    //       console.error(err)
-    //     });
+    const git = new GitClient()
+    const listOfFilesUpdated = await git.getDiff(base,head);
 
-
-    core.info(`diff: `+base+'->'+head);
-
-    const out = await git.diffSummary(['--name-only', base, head])
-    // const out = await git.diffSummary(['--name-only'])
-
-    core.info(`files updated: ${out.changed}`)
-    core.setOutput('packages', JSON.stringify(out.files))
+    core.info(`files updated: ${listOfFilesUpdated.length}`)
+    for (const file of listOfFilesUpdated){
+      core.debug(`file updated: ${file}`)
+    }
+    // var projectsPath = core.getInput('folder', {required: true, trimWhitespace: true})
+    var projectsPath = cleanProjectsPathEndSlash("example/sourceTest/")
+    core.info(`projectsPath: ${projectsPath}`)
+    core.setOutput('packages', JSON.stringify(extractProjectFromFiles(projectsPath,listOfFilesUpdated)))
 
     return
-    // core.info(`Files exec:\n ${out}`)
-    // const files = out.split('\n')
-    // const projects = extractProjectFromFiles(files)
-    // core.info(`packages updated: ${projects.join(', ')}`)
-    // core.setOutput('packages', JSON.stringify(projects))
-    // return files
-
-    // const eRes = exec(
-    //   `git diff --name-only ${base} ${head}`,
-    //   (error: ExecException | null, stdout: string, stderr: string) => {
-    //     if (error) {
-    //       core.error(`exec error: ${error.message}`)
-    //       core.setFailed(`exec error: ${error.message}`)
-    //       return
-    //     }
-    //     if (stderr) {
-    //       core.error(`exec stderr: ${stderr}`)
-    //       core.setFailed(`exec stderr: ${stderr}`)
-    //       return
-    //     }
-    //     core.info(`Files exec:\n ${stdout}`)
-    //     const files = stdout.split('\n')
-    //     const projects = extractProjectFromFiles(files)
-    //     core.info(`packages updated: ${projects.join(', ')}`)
-    //     core.setOutput('packages', JSON.stringify(projects))
-    //     return files
-    //   }
-    // )
-    // core.info(`PID ${eRes.pid}`)
-    // core.info(`Status ${eRes.s}`)
-    // core.info(`Signal ${eRes.signalCode}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
+
+function extractProjectFromFiles(pathToProjects: string, listOfFiles: string[]): string[] {
+  const projects = new Set<string>()
+  for (const file of listOfFiles) {
+    if (!file.startsWith(pathToProjects)) {
+        continue
+    }
+    var route = file.replace(pathToProjects,'')
+    core.info(`route: ${route}`)
+    const project = route.split('/')[0]
+    projects.add(project)
+  }
+  return Array.from(projects)
+}
+
+function cleanProjectsPathEndSlash(path: string): string {
+  return path.endsWith('/') ? path : path+'/'
+}
+
 run()
