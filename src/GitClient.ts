@@ -33,7 +33,7 @@ class GitClient {
 
   public async getStatus(core: typeof import('@actions/core')) {
     core.debug('Getting status')
-    await this.git.status((err, status) => {
+    return await this.git.status((err, status) => {
       if (!err) {
         core.debug(status.current ? status.current : 'EMPTY')
       } else {

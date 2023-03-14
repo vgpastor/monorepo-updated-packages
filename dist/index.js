@@ -46,7 +46,7 @@ class GitClient {
     getStatus(core) {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug('Getting status');
-            yield this.git.status((err, status) => {
+            return yield this.git.status((err, status) => {
                 if (!err) {
                     core.debug(status.current ? status.current : 'EMPTY');
                 }
@@ -139,14 +139,16 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             const git = new GitClient_1.GitClient();
-            yield git.getStatus(core);
+            const status = yield git.getStatus(core);
+            core.info(`base: ${base}`);
+            core.info(`head: ${head}`);
             const listOfFilesUpdated = yield git.getDiff(base, head);
             core.info(`files updated: ${listOfFilesUpdated.length}`);
             for (const file of listOfFilesUpdated) {
                 core.debug(`file updated: ${file}`);
             }
             // var projectsPath = core.getInput('folder', {required: true, trimWhitespace: true})
-            var projectsPath = cleanProjectsPathEndSlash('example/sourceTest/');
+            const projectsPath = cleanProjectsPathEndSlash('example/sourceTest/');
             core.info(`projectsPath: ${projectsPath}`);
             core.setOutput('packages', JSON.stringify(extractProjectFromFiles(projectsPath, listOfFilesUpdated)));
             return;
@@ -163,7 +165,7 @@ function extractProjectFromFiles(pathToProjects, listOfFiles) {
         if (!file.startsWith(pathToProjects)) {
             continue;
         }
-        var route = file.replace(pathToProjects, '');
+        const route = file.replace(pathToProjects, '');
         core.info(`route: ${route}`);
         const project = route.split('/')[0];
         projects.add(project);
@@ -171,7 +173,7 @@ function extractProjectFromFiles(pathToProjects, listOfFiles) {
     return Array.from(projects);
 }
 function cleanProjectsPathEndSlash(path) {
-    return path.endsWith('/') ? path : path + '/';
+    return path.endsWith('/') ? path : `${path}/`;
 }
 run();
 

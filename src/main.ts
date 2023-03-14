@@ -28,7 +28,10 @@ async function run(): Promise<void> {
 
     const git = new GitClient()
 
-    await git.getStatus(core)
+    const status = await git.getStatus(core)
+
+    core.info(`base: ${base}`)
+    core.info(`head: ${head}`)
 
     const listOfFilesUpdated = await git.getDiff(base, head)
 
@@ -37,7 +40,7 @@ async function run(): Promise<void> {
       core.debug(`file updated: ${file}`)
     }
     // var projectsPath = core.getInput('folder', {required: true, trimWhitespace: true})
-    var projectsPath = cleanProjectsPathEndSlash('example/sourceTest/')
+    const projectsPath = cleanProjectsPathEndSlash('example/sourceTest/')
     core.info(`projectsPath: ${projectsPath}`)
     core.setOutput(
       'packages',
@@ -59,7 +62,7 @@ function extractProjectFromFiles(
     if (!file.startsWith(pathToProjects)) {
       continue
     }
-    var route = file.replace(pathToProjects, '')
+    const route = file.replace(pathToProjects, '')
     core.info(`route: ${route}`)
     const project = route.split('/')[0]
     projects.add(project)
@@ -68,7 +71,7 @@ function extractProjectFromFiles(
 }
 
 function cleanProjectsPathEndSlash(path: string): string {
-  return path.endsWith('/') ? path : path + '/'
+  return path.endsWith('/') ? path : `${path}/`
 }
 
 run()
