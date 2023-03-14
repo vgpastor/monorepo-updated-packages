@@ -30,6 +30,7 @@ class GitClient {
         };
         this.git = (0, simple_git_1.simpleGit)(options);
         this.enableSecurePath();
+        this.fetchAll();
     }
     enableSecurePath() {
         const commands = [
@@ -40,6 +41,11 @@ class GitClient {
             this.path
         ];
         this.git.raw(commands, (err, result) => {
+            // console.log(result)
+        });
+    }
+    fetchAll() {
+        this.git.raw(['fetch', '--prune', '--unshallow'], (err, result) => {
             // console.log(result)
         });
     }
@@ -145,7 +151,10 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             const git = new GitClient_1.GitClient();
-            const status = yield git.getStatus(core);
+            if (core.isDebug()) {
+                core.debug('Git status');
+                yield git.getStatus(core);
+            }
             core.info(`base: ${base}`);
             core.info(`head: ${head}`);
             const listOfFilesUpdated = yield git.getDiff(base, head);

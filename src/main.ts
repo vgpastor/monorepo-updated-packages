@@ -28,7 +28,10 @@ async function run(): Promise<void> {
 
     const git = new GitClient()
 
-    const status = await git.getStatus(core)
+    if (core.isDebug()) {
+      core.debug('Git status')
+      await git.getStatus(core)
+    }
 
     core.info(`base: ${base}`)
     core.info(`head: ${head}`)

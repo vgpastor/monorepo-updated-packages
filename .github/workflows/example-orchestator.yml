@@ -13,10 +13,6 @@ jobs:
       packages: ${{ steps.monorepo-packages.outputs.packages }}
     steps:
       - uses: actions/checkout@v3
-      - run: |
-          git fetch --prune --unshallow
-      - run: |
-          git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E 'example/sourceTest/.*' | cut -d '/' -f 3 | uniq
       - id: monorepo-packages
         uses: ./ # vgpastor/monorepo-updated-packages
         with:

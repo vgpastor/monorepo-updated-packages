@@ -16,6 +16,7 @@ class GitClient {
 
     this.git = simpleGit(options)
     this.enableSecurePath()
+    this.fetchAll()
   }
 
   private enableSecurePath() {
@@ -31,6 +32,11 @@ class GitClient {
     })
   }
 
+  private fetchAll() {
+    this.git.raw(['fetch', '--prune', '--unshallow'], (err, result) => {
+      // console.log(result)
+    })
+  }
   async getStatus(core: typeof import('@actions/core')) {
     core.debug('Getting status')
     return await this.git.status((err, status) => {
