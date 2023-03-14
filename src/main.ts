@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import {GitClient} from './gitClient'
+import {GitClient} from './GitClient'
 async function run(): Promise<void> {
   try {
     core.info('Action runs')

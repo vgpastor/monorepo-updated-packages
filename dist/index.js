@@ -1,7 +1,7 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 6747:
+/***/ 3415:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -44,7 +44,7 @@ class GitClient {
         });
     }
     getStatus(core) {
-        core.debug("getStatus");
+        core.debug('Getting status');
         this.git.status((err, status) => {
             if (!err) {
                 core.debug(status.current ? status.current : 'EMPTY');
@@ -113,7 +113,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
-const gitClient_1 = __nccwpck_require__(6747);
+const GitClient_1 = __nccwpck_require__(3415);
 function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
@@ -136,7 +136,7 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            const git = new gitClient_1.GitClient();
+            const git = new GitClient_1.GitClient();
             git.getStatus(core);
             const listOfFilesUpdated = yield git.getDiff(base, head);
             core.info(`files updated: ${listOfFilesUpdated.length}`);

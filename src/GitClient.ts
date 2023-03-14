@@ -32,6 +32,7 @@ class GitClient {
   }
 
   public getStatus(core: typeof import('@actions/core')) {
+    core.debug('Getting status')
     this.git.status((err, status) => {
       if (!err) {
         core.debug(status.current ? status.current : 'EMPTY')
