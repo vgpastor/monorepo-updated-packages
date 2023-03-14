@@ -1,8 +1,26 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import {simpleGit} from 'simple-git'
+import { simpleGit, SimpleGit, SimpleGitOptions } from 'simple-git';
+
+const options: Partial<SimpleGitOptions> = {
+  baseDir: process.cwd(),
+  binary: 'git',
+  maxConcurrentProcesses: 6,
+  trimmed: false,
+  config:['safe.directory='+process.cwd()]
+};
+
+const git: SimpleGit = simpleGit(options);
+const commands = ['config', '--global', '--add', 'safe.directory', process.cwd()];
+
+// using an array of commands and node-style callback
+git.raw(commands, (err, result) => {
+  // console.log(result)
+});
+
 async function run(): Promise<void> {
   try {
+    const cwd = process.cwd();
     core.info('Action runs')
     core.debug('Action runs DEBUG')
 
@@ -26,11 +44,24 @@ async function run(): Promise<void> {
         )
     }
     core.info(`Base: ${base}`)
+    base = "0cf252834ca881794e6ce24e4bd803df6c973d0b"
     core.info(`Head: ${head}`)
+    head = "8ef64a7929361e120f278be6ff34460d0ca3bb92"
+
+    // git.status()
+    //     .then((status) => {
+    //       console.log(status)
+    //     })
+    //     .catch((err) => {
+    //       console.error(err)
+    //     });
+
 
     core.info(`diff: `+base+'->'+head);
 
-    const out = await simpleGit().diffSummary(['--name-only', base, head])
+    const out = await git.diffSummary(['--name-only', base, head])
+    // const out = await git.diffSummary(['--name-only'])
+
     core.info(`files updated: ${out.changed}`)
     core.setOutput('packages', JSON.stringify(out.files))
 
