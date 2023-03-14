@@ -28,7 +28,7 @@ async function run(): Promise<void> {
 
     const git = new GitClient()
 
-    git.getStatus(core)
+    await git.getStatus(core)
 
     const listOfFilesUpdated = await git.getDiff(base, head)
 

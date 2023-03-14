@@ -44,14 +44,16 @@ class GitClient {
         });
     }
     getStatus(core) {
-        core.debug('Getting status');
-        this.git.status((err, status) => {
-            if (!err) {
-                core.debug(status.current ? status.current : 'EMPTY');
-            }
-            else {
-                core.error(err.message);
-            }
+        return __awaiter(this, void 0, void 0, function* () {
+            core.debug('Getting status');
+            yield this.git.status((err, status) => {
+                if (!err) {
+                    core.debug(status.current ? status.current : 'EMPTY');
+                }
+                else {
+                    core.error(err.message);
+                }
+            });
         });
     }
     getDiff(base, head) {
@@ -137,7 +139,7 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             const git = new GitClient_1.GitClient();
-            git.getStatus(core);
+            yield git.getStatus(core);
             const listOfFilesUpdated = yield git.getDiff(base, head);
             core.info(`files updated: ${listOfFilesUpdated.length}`);
             for (const file of listOfFilesUpdated) {
