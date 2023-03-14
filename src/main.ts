@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import {GitClient} from "./GitClient";
+import {GitClient} from './GitClient'
 async function run(): Promise<void> {
   try {
     core.info('Action runs')
@@ -27,16 +27,22 @@ async function run(): Promise<void> {
     }
 
     const git = new GitClient()
-    const listOfFilesUpdated = await git.getDiff(base,head);
+
+    git.getStatus(core)
+
+    const listOfFilesUpdated = await git.getDiff(base, head)
 
     core.info(`files updated: ${listOfFilesUpdated.length}`)
-    for (const file of listOfFilesUpdated){
+    for (const file of listOfFilesUpdated) {
       core.debug(`file updated: ${file}`)
     }
     // var projectsPath = core.getInput('folder', {required: true, trimWhitespace: true})
-    var projectsPath = cleanProjectsPathEndSlash("example/sourceTest/")
+    var projectsPath = cleanProjectsPathEndSlash('example/sourceTest/')
     core.info(`projectsPath: ${projectsPath}`)
-    core.setOutput('packages', JSON.stringify(extractProjectFromFiles(projectsPath,listOfFilesUpdated)))
+    core.setOutput(
+      'packages',
+      JSON.stringify(extractProjectFromFiles(projectsPath, listOfFilesUpdated))
+    )
 
     return
   } catch (error) {
@@ -44,13 +50,16 @@ async function run(): Promise<void> {
   }
 }
 
-function extractProjectFromFiles(pathToProjects: string, listOfFiles: string[]): string[] {
+function extractProjectFromFiles(
+  pathToProjects: string,
+  listOfFiles: string[]
+): string[] {
   const projects = new Set<string>()
   for (const file of listOfFiles) {
     if (!file.startsWith(pathToProjects)) {
-        continue
+      continue
     }
-    var route = file.replace(pathToProjects,'')
+    var route = file.replace(pathToProjects, '')
     core.info(`route: ${route}`)
     const project = route.split('/')[0]
     projects.add(project)
@@ -59,7 +68,7 @@ function extractProjectFromFiles(pathToProjects: string, listOfFiles: string[]):
 }
 
 function cleanProjectsPathEndSlash(path: string): string {
-  return path.endsWith('/') ? path : path+'/'
+  return path.endsWith('/') ? path : path + '/'
 }
 
 run()

@@ -37,6 +37,16 @@ class GitClient {
             // console.log(result)
         });
     }
+    getStatus(core) {
+        this.git.status((err, status) => {
+            if (!err) {
+                core.debug(status.current ? status.current : 'EMPTY');
+            }
+            else {
+                core.error(err.message);
+            }
+        });
+    }
     getDiff(base, head) {
         return __awaiter(this, void 0, void 0, function* () {
             const out = yield this.git.diffSummary(['--name-only', base, head]);
@@ -119,12 +129,8 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            core.info(`Base: ${base}`);
-            base = "0cf252834ca881794e6ce24e4bd803df6c973d0b";
-            core.info(`Head: ${head}`);
-            head = "8ef64a7929361e120f278be6ff34460d0ca3bb92";
-            core.info(`diff: ` + base + '->' + head);
             const git = new GitClient_1.GitClient();
+            git.getStatus(core);
             const listOfFilesUpdated = yield git.getDiff(base, head);
             core.info(`files updated: ${listOfFilesUpdated.length}`);
             for (const file of listOfFilesUpdated) {
