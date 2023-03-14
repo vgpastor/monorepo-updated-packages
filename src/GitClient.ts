@@ -31,7 +31,7 @@ class GitClient {
     })
   }
 
-  public async getStatus(core: typeof import('@actions/core')) {
+  async getStatus(core: typeof import('@actions/core')) {
     core.debug('Getting status')
     return await this.git.status((err, status) => {
       if (!err) {
@@ -39,16 +39,22 @@ class GitClient {
       } else {
         core.error(err.message)
       }
+      if (status.current) {
+        core.debug(`Current branch: ${status.current}`)
+      }
+      if (status.tracking) {
+        core.debug(`Tracking branch: ${status.tracking}`)
+      }
     })
   }
 
-  public async getDiff(base: string, head: string) {
+  async getDiff(base: string, head: string) {
     const out = await this.git.diffSummary(['--name-only', base, head])
     return this.flatOutputDiff(out)
   }
 
   private flatOutputDiff(result: DiffResult) {
-    var listOfFiles: string[] = []
+    const listOfFiles: string[] = []
     for (const file of result.files) {
       listOfFiles.push(file.file)
     }

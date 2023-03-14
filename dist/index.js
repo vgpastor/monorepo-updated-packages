@@ -53,6 +53,12 @@ class GitClient {
                 else {
                     core.error(err.message);
                 }
+                if (status.current) {
+                    core.debug(`Current branch: ${status.current}`);
+                }
+                if (status.tracking) {
+                    core.debug(`Tracking branch: ${status.tracking}`);
+                }
             });
         });
     }
@@ -63,7 +69,7 @@ class GitClient {
         });
     }
     flatOutputDiff(result) {
-        var listOfFiles = [];
+        const listOfFiles = [];
         for (const file of result.files) {
             listOfFiles.push(file.file);
         }
