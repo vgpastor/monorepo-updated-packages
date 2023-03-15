@@ -43,9 +43,16 @@ async function run(): Promise<void> {
     for (const file of listOfFilesUpdated) {
       core.debug(`file updated: ${file}`)
     }
-    // var projectsPath = core.getInput('folder', {required: true, trimWhitespace: true})
-    const projectsPath = cleanProjectsPathEndSlash('example/sourceTest/')
-    core.info(`projectsPath: ${projectsPath}`)
+    const projectsPath = cleanProjectsPathEndSlash(
+      core.getInput('folder', {required: true, trimWhitespace: true})
+    )
+    core.info(`packages Path: ${projectsPath}`)
+    core.debug(
+      `packages updated: ${extractProjectFromFiles(
+        projectsPath,
+        listOfFilesUpdated
+      )}`
+    )
     core.setOutput(
       'packages',
       JSON.stringify(extractProjectFromFiles(projectsPath, listOfFilesUpdated))
