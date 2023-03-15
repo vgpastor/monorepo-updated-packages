@@ -1,17 +1,15 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
-import GithubApi from './infrastructure/githuba-api'
-
+import {GitClient} from './git-client'
 async function run(): Promise<void> {
   try {
-    const folder = core.getInput('folder', {required: true})
+    core.info('Action runs')
+    core.debug('Action runs DEBUG')
 
-    const githubApi = new GithubApi(core.getInput('token', {required: true}))
-
-    // Define the base and head commits to be extracted from the payload.
     let base = ''
     let head = ''
 
+    core.info(`Action runs ${context.eventName}`)
     switch (context.eventName) {
       case 'pull_request':
         base = context.payload.pull_request?.base?.sha
@@ -28,20 +26,56 @@ async function run(): Promise<void> {
         )
     }
 
-    // eslint-disable-next-line github/no-then
-    const filesModified = await githubApi
-      .getModifiedFiles(base, head)
-      .then(files => {
-        core.info(`Files modified: ${files}`)
-        // return files
-      })
+    const git = new GitClient()
+    await git.fetchAll()
 
-    // filesModified.then(files => {
-    //   core.info(`Files modified: ${files}`)
-    // })
+    if (core.isDebug()) {
+      core.debug('Git status')
+      await git.getStatus()
+    }
+
+    core.info(`base: ${base}`)
+    core.info(`head: ${head}`)
+
+    const listOfFilesUpdated = await git.getDiff(base, head)
+
+    core.info(`files updated: ${listOfFilesUpdated.length}`)
+    for (const file of listOfFilesUpdated) {
+      core.debug(`file updated: ${file}`)
+    }
+    // var projectsPath = core.getInput('folder', {required: true, trimWhitespace: true})
+    const projectsPath = cleanProjectsPathEndSlash('example/sourceTest/')
+    core.info(`projectsPath: ${projectsPath}`)
+    core.setOutput(
+      'packages',
+      JSON.stringify(extractProjectFromFiles(projectsPath, listOfFilesUpdated))
+    )
+
+    return
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
+}
+
+function extractProjectFromFiles(
+  pathToProjects: string,
+  listOfFiles: string[]
+): string[] {
+  const projects = new Set<string>()
+  for (const file of listOfFiles) {
+    if (!file.startsWith(pathToProjects)) {
+      continue
+    }
+    const route = file.replace(pathToProjects, '')
+    core.info(`route: ${route}`)
+    const project = route.split('/')[0]
+    projects.add(project)
+  }
+  return Array.from(projects)
+}
+
+function cleanProjectsPathEndSlash(path: string): string {
+  return path.endsWith('/') ? path : `${path}/`
 }
 
 run()

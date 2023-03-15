@@ -1,0 +1,15 @@
+version: '3.6'
+
+services:
+  node:
+    image: node
+    volumes:
+      - ~/.aws:/var/www/.aws
+      - ~/.composer:/var/www/.composer
+      - ~/.ssh:/var/www/.ssh
+      - .:/root/code/:delegated
+    working_dir: /root/code
+    tty: true
+    entrypoint: "bash"
+#    command:
+#      - npx ts-node

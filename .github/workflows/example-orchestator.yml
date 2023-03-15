@@ -1,0 +1,39 @@
+name: 'EXAMPLE Orchest test fo modified project'
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.monorepo-packages.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: monorepo-packages
+        uses: ./ # vgpastor/monorepo-updated-packages
+        with:
+          folder: example/sourceTest
+  exec:
+    needs: [ setup ]
+    runs-on: ubuntu-latest
+    if: ${{ needs.setup.outputs.packages != '' }}
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.setup.outputs.packages)}}
+        node-version: [14.x, 16.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cd example/sourceTest/${{ matrix.project }} && npm install
+      - run: cd example/sourceTest/${{ matrix.project }} && npm ci
+      - run: cd example/sourceTest/${{ matrix.project }} && npm run build --if-present
+      - run: cd example/sourceTest/${{ matrix.project }} && npm test
+
