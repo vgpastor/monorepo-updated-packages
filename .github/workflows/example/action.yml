@@ -1,18 +1,21 @@
-name: 'EXAMPLE Test projects'
+---
+name: EXAMPLE Test projects
 on:
   workflow_dispatch:
     inputs:
       app:
-        description: 'App to execute test'
+        description: App to execute test
         required: true
-
 description: Example test projects
 jobs:
   test-project-works:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 12.x, 14.x, 15.x ]
+        node-version:
+          - 12.x
+          - 14.x
+          - 15.x
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
