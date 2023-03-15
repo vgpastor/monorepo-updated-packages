@@ -27,6 +27,7 @@ async function run(): Promise<void> {
     }
 
     const git = new GitClient()
+    await git.fetchAll()
 
     if (core.isDebug()) {
       core.debug('Git status')

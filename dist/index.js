@@ -54,7 +54,6 @@ class GitClient {
         };
         this.git = (0, simple_git_1.simpleGit)(options);
         this.enableSecurePath();
-        this.fetchAll();
     }
     enableSecurePath() {
         const commands = [
@@ -69,11 +68,13 @@ class GitClient {
         });
     }
     fetchAll() {
-        this.git.raw(['fetch', '--prune'], (err, result) => {
-            core.info('Fetching all->' + result);
-            if (err) {
-                core.error(err.message);
-            }
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.git.raw(['fetch', '--prune'], (err, result) => {
+                core.info('Fetching all->' + result);
+                if (err) {
+                    core.error(err.message);
+                }
+            });
         });
     }
     getStatus() {
@@ -178,6 +179,7 @@ function run() {
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
             const git = new GitClient_1.GitClient();
+            yield git.fetchAll();
             if (core.isDebug()) {
                 core.debug('Git status');
                 yield git.getStatus();

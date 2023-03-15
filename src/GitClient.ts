@@ -16,7 +16,6 @@ class GitClient {
 
     this.git = simpleGit(options)
     this.enableSecurePath()
-    this.fetchAll()
   }
 
   private enableSecurePath() {
@@ -32,8 +31,8 @@ class GitClient {
     })
   }
 
-  private fetchAll() {
-    this.git.raw(['fetch', '--prune'], (err, result) => {
+  public async fetchAll() {
+    await this.git.raw(['fetch', '--prune'], (err, result) => {
       core.info('Fetching all->'+result)
       if(err){
         core.error(err.message)
