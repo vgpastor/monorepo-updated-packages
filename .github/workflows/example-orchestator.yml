@@ -26,6 +26,7 @@ jobs:
         value: ${{ fromJson(needs.setup.outputs.packages)}}
 
     steps:
+    - uses: actions/checkout@v3
     - uses: ./.github/workflows/example/
       with:
         app: ${{ matrix.value }}
