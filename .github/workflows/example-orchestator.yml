@@ -23,7 +23,7 @@ jobs:
     if: ${{ needs.setup.outputs.packages != '' }}
     strategy:
       matrix:
-        project: ${{ fromJson(needs.setup.outputs.packages)}}
+        project: ${{ fromJson(needs.setup.outputs.packages) }}
         node-version: [14.x, 16.x]
 
     steps:
