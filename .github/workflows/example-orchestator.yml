@@ -24,10 +24,19 @@ jobs:
     strategy:
       matrix:
         project: ${{ fromJson(needs.setup.outputs.packages)}}
+        node-version:
+          - 12.x
+          - 14.x
+          - 15.x
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: ./.github/workflows/example/
-      with:
-        app: ${{ matrix.project }}
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: cd example/sourceTest/${{ matrix.project }} && npm install
+      - run: cd example/sourceTest/${{ matrix.project }} && npm ci
+      - run: cd example/sourceTest/${{ matrix.project }} && npm run build --if-present
+      - run: cd example/sourceTest/${{ matrix.project }} && npm test
 
