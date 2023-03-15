@@ -7,8 +7,8 @@ on:
         required: true
 
 description: Example test projects
-runs:
-  build:
+jobs:
+  test-project-works:
     runs-on: ubuntu-latest
     strategy:
       matrix:
