@@ -6,15 +6,13 @@ on:
         description: 'App to execute test'
         required: true
 
-jobs:
-  build: # make sure build/ci work properly
-
+description: Example test projects
+runs:
+  build:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 15.x]
-
+        node-version: [ 12.x, 14.x, 15.x ]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}

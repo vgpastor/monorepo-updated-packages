@@ -23,11 +23,11 @@ jobs:
     if: ${{ needs.setup.outputs.packages != '' }}
     strategy:
       matrix:
-        value: ${{ fromJson(needs.setup.outputs.packages)}}
+        project: ${{ fromJson(needs.setup.outputs.packages)}}
 
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/workflows/example/
       with:
-        app: ${{ matrix.value }}
+        app: ${{ matrix.project }}
 
