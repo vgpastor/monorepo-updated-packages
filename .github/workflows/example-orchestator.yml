@@ -27,7 +27,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - uses: ./.github/workflows/example/action.yaml
+    - uses: ./.github/workflows/example/action.yaml@test
       with:
         app: ${{ matrix.project }}
 
