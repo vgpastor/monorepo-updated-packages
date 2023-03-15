@@ -71,6 +71,9 @@ class GitClient {
     fetchAll() {
         this.git.raw(['fetch', '--prune', '--unshallow'], (err, result) => {
             core.info('Fetching all->' + result);
+            if (err) {
+                core.error(err.message);
+            }
         });
     }
     getStatus() {
