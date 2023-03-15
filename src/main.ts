@@ -30,7 +30,7 @@ async function run(): Promise<void> {
 
     if (core.isDebug()) {
       core.debug('Git status')
-      await git.getStatus(core)
+      await git.getStatus()
     }
 
     core.info(`base: ${base}`)

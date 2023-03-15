@@ -34,10 +34,10 @@ class GitClient {
 
   private fetchAll() {
     this.git.raw(['fetch', '--prune', '--unshallow'], (err, result) => {
-      // console.log(result)
+      core.info('Fetching all->'+result)
     })
   }
-  async getStatus(core: typeof import('@actions/core')) {
+  async getStatus() {
     core.debug('Getting status')
     return await this.git.status((err, status) => {
       if (!err) {
