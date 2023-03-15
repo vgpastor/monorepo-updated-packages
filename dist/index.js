@@ -1,7 +1,7 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 3415:
+/***/ 591:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -40,7 +40,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitClient = void 0;
-const simple_git_1 = __nccwpck_require__(9103);
+const simpleGit = __importStar(__nccwpck_require__(9103));
 const core = __importStar(__nccwpck_require__(2186));
 class GitClient {
     constructor() {
@@ -52,7 +52,7 @@ class GitClient {
             trimmed: false
             // config:['safe.directory='+path]
         };
-        this.git = (0, simple_git_1.simpleGit)(options);
+        this.git = simpleGit.simpleGit(options);
         this.enableSecurePath();
     }
     enableSecurePath() {
@@ -64,13 +64,16 @@ class GitClient {
             this.path
         ];
         this.git.raw(commands, (err, result) => {
-            // console.log(result)
+            core.info(`Fetching all-> + ${result}`);
+            if (err) {
+                core.error(err.message);
+            }
         });
     }
     fetchAll() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.git.raw(['fetch', '--prune'], (err, result) => {
-                core.info('Fetching all->' + result);
+                core.info(`Fetching all-> + ${result}`);
                 if (err) {
                     core.error(err.message);
                 }
@@ -155,7 +158,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
-const GitClient_1 = __nccwpck_require__(3415);
+const git_client_1 = __nccwpck_require__(591);
 function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
@@ -178,7 +181,7 @@ function run() {
                     core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
                         "Please submit an issue on this action's GitHub repo if you believe this in correct.");
             }
-            const git = new GitClient_1.GitClient();
+            const git = new git_client_1.GitClient();
             yield git.fetchAll();
             if (core.isDebug()) {
                 core.debug('Git status');
