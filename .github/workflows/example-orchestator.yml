@@ -26,7 +26,7 @@ jobs:
         value: ${{ fromJson(needs.setup.outputs.packages)}}
 
     steps:
-    - uses: ./.github/workflows/example/test.yml
+    - uses: ./.github/workflows/example/
       with:
         app: ${{ matrix.value }}
 
