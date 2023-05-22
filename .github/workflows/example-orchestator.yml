@@ -14,13 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: monorepo-packages
-        uses: ./ # vgpastor/monorepo-updated-packages
+        uses: ./ # vgpastor/monorepo-updated-packages@v1.0
         with:
           folder: example/sourceTest
   exec:
     needs: [ setup ]
     runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.packages != '' }}
+    if: ${{ needs.setup.outputs.packages != '{}' }}
     strategy:
       matrix:
         project: ${{ fromJson(needs.setup.outputs.packages) }}
