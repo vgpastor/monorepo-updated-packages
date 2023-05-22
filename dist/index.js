@@ -72,7 +72,7 @@ class GitClient {
     }
     fetchAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.git.raw(['fetch', '--prune'], err => {
+            yield this.git.raw(['fetch'], err => {
                 if (err) {
                     core.error(err.message);
                 }
@@ -82,7 +82,7 @@ class GitClient {
     getStatus() {
         return __awaiter(this, void 0, void 0, function* () {
             core.debug('Getting status');
-            return yield this.git.status((err, status) => {
+            return this.git.status((err, status) => {
                 if (!err) {
                     core.debug(status.current ? status.current : 'EMPTY');
                 }
@@ -9229,7 +9229,9 @@ var init_spawn_options_plugin = __esm({
 
 // src/lib/plugins/timout-plugin.ts
 function timeoutPlugin({
-  block
+  block,
+  stdErr = true,
+  stdOut = true
 }) {
   if (block > 0) {
     return {
@@ -9253,8 +9255,8 @@ function timeoutPlugin({
           stop();
           context.kill(new GitPluginError(void 0, "timeout", `block timeout reached`));
         }
-        (_a2 = context.spawned.stdout) == null ? void 0 : _a2.on("data", wait);
-        (_b = context.spawned.stderr) == null ? void 0 : _b.on("data", wait);
+        stdOut && ((_a2 = context.spawned.stdout) == null ? void 0 : _a2.on("data", wait));
+        stdErr && ((_b = context.spawned.stderr) == null ? void 0 : _b.on("data", wait));
         context.spawned.on("exit", stop);
         context.spawned.on("close", stop);
         wait();
@@ -10555,6 +10557,29 @@ var init_push = __esm({
   }
 });
 
+// src/lib/tasks/show.ts
+function show_default() {
+  return {
+    showBuffer() {
+      const commands = ["show", ...getTrailingOptions(arguments, 1)];
+      if (!commands.includes("--binary")) {
+        commands.splice(1, 0, "--binary");
+      }
+      return this._runTask(straightThroughBufferTask(commands), trailingFunctionArgument(arguments));
+    },
+    show() {
+      const commands = ["show", ...getTrailingOptions(arguments, 1)];
+      return this._runTask(straightThroughStringTask(commands), trailingFunctionArgument(arguments));
+    }
+  };
+}
+var init_show = __esm({
+  "src/lib/tasks/show.ts"() {
+    init_utils();
+    init_task();
+  }
+});
+
 // src/lib/responses/FileStatusSummary.ts
 var fromPathRegex, FileStatusSummary;
 var init_FileStatusSummary = __esm({
@@ -10804,6 +10829,7 @@ var init_simple_git_api = __esm({
     init_log();
     init_merge();
     init_push();
+    init_show();
     init_status();
     init_task();
     init_version();
@@ -10870,7 +10896,7 @@ var init_simple_git_api = __esm({
         return this._runTask(statusTask(getTrailingOptions(arguments)), trailingFunctionArgument(arguments));
       }
     };
-    Object.assign(SimpleGitApi.prototype, checkout_default(), commit_default(), config_default(), grep_default(), log_default(), version_default());
+    Object.assign(SimpleGitApi.prototype, checkout_default(), commit_default(), config_default(), grep_default(), log_default(), show_default(), version_default());
   }
 });
 
@@ -11802,9 +11828,6 @@ var require_git = __commonJS({
     Git2.prototype.revparse = function() {
       const commands = ["rev-parse", ...getTrailingOptions2(arguments, true)];
       return this._runTask(straightThroughStringTask2(commands, true), trailingFunctionArgument2(arguments));
-    };
-    Git2.prototype.show = function(options, then) {
-      return this._runTask(straightThroughStringTask2(["show", ...getTrailingOptions2(arguments, 1)]), trailingFunctionArgument2(arguments));
     };
     Git2.prototype.clean = function(mode, options, then) {
       const usingCleanOptionsArray = isCleanOptionsArray2(mode);
