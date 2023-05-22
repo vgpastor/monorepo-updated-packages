@@ -35,7 +35,7 @@ class GitClient {
   }
 
   async fetchAll(): Promise<void> {
-    await this.git.raw(['fetch', '--prune'], err => {
+    await this.git.raw(['fetch'], err => {
       if (err) {
         core.error(err.message)
       }
@@ -43,7 +43,7 @@ class GitClient {
   }
   async getStatus(): Promise<simpleGit.StatusResult> {
     core.debug('Getting status')
-    return await this.git.status((err, status) => {
+    return this.git.status((err, status) => {
       if (!err) {
         core.debug(status.current ? status.current : 'EMPTY')
       } else {
