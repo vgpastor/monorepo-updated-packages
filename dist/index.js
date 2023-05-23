@@ -1,6 +1,78 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 1643:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UpdatedCommits = void 0;
+class UpdatedCommits {
+    constructor(base, head) {
+        this.base = base;
+        this.head = head;
+    }
+}
+exports.UpdatedCommits = UpdatedCommits;
+
+
+/***/ }),
+
+/***/ 4936:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.FindCommits = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const updated_commits_1 = __nccwpck_require__(1643);
+class FindCommits {
+    find(ctx, status) {
+        var _a, _b, _c, _d;
+        core.info(`Action runs ${ctx.eventName}`);
+        switch (ctx.eventName) {
+            case 'pull_request':
+                return new updated_commits_1.UpdatedCommits((_b = (_a = ctx.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha, (_d = (_c = ctx.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha);
+            case 'push':
+                return new updated_commits_1.UpdatedCommits(ctx.payload.before, ctx.payload.after);
+            default:
+                status.current;
+                core.setFailed(`This action only supports pull requests and pushes, ${ctx.eventName} events are not supported. ` +
+                    "Please submit an issue on this action's GitHub repo if you believe this in correct.");
+                return null;
+        }
+    }
+}
+exports.FindCommits = FindCommits;
+
+
+/***/ }),
+
 /***/ 591:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -72,7 +144,7 @@ class GitClient {
     }
     fetchAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.git.raw(['fetch'], err => {
+            yield this.git.raw(['fetch', '-all'], err => {
                 if (err) {
                     core.error(err.message);
                 }
@@ -102,6 +174,25 @@ class GitClient {
         return __awaiter(this, void 0, void 0, function* () {
             const out = yield this.git.diffSummary(['--name-only', base, head]);
             return this.flatOutputDiff(out);
+        });
+    }
+    createBranch(branchName, base, force) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (force) {
+                //Delete branch
+                yield this.git.raw(['branch', '-D', branchName], (err, result) => {
+                    if (err) {
+                        core.error(err.message);
+                    }
+                    core.info(`Branch deleted: ${result}`);
+                });
+            }
+            yield this.git.raw(['branch', branchName, base], (err, result) => {
+                if (err) {
+                    core.error(err.message);
+                }
+                core.info(`Branch created: ${result}`);
+            });
         });
     }
     flatOutputDiff(result) {
@@ -158,37 +249,29 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const git_client_1 = __nccwpck_require__(591);
+const findCommits_1 = __nccwpck_require__(4936);
+const findCommits = new findCommits_1.FindCommits();
+const git = new git_client_1.GitClient();
 function run() {
-    var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.info('Action runs');
-            core.debug('Action runs DEBUG');
-            let base = '';
-            let head = '';
-            core.info(`Action runs ${github_1.context.eventName}`);
-            switch (github_1.context.eventName) {
-                case 'pull_request':
-                    base = (_b = (_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha;
-                    head = (_d = (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha;
-                    break;
-                case 'push':
-                    base = github_1.context.payload.before;
-                    head = github_1.context.payload.after;
-                    break;
-                default:
-                    core.setFailed(`This action only supports pull requests and pushes, ${github_1.context.eventName} events are not supported. ` +
-                        "Please submit an issue on this action's GitHub repo if you believe this in correct.");
+            const status = yield git.getStatus();
+            core.debug(`GIT STATUS: ${JSON.stringify(status)}`);
+            const updatedCommits = findCommits.find(github_1.context, status);
+            if (updatedCommits == null) {
+                core.error('No updated commits found');
+                return;
             }
-            const git = new git_client_1.GitClient();
+            core.info(`base: ${updatedCommits.base}`);
+            core.info(`head: ${updatedCommits.head}`);
             yield git.fetchAll();
+            yield git.createBranch('testDiff', updatedCommits.base, true);
+            //git branch testDiff updatedCommits.head
+            //git diff --name-only testDiff updatedCommits.base
             if (core.isDebug()) {
                 core.debug('Git status');
-                yield git.getStatus();
             }
-            core.info(`base: ${base}`);
-            core.info(`head: ${head}`);
-            const listOfFilesUpdated = yield git.getDiff(base, head);
+            const listOfFilesUpdated = yield git.getDiff('testDiff', updatedCommits.head);
             core.info(`files updated: ${listOfFilesUpdated.length}`);
             for (const file of listOfFilesUpdated) {
                 core.debug(`file updated: ${file}`);
@@ -221,6 +304,12 @@ function extractProjectFromFiles(pathToProjects, listOfFiles) {
 function cleanProjectsPathEndSlash(path) {
     return path.endsWith('/') ? path : `${path}/`;
 }
+// if (core.isDebug()) {
+//   core.debug('Git status')
+//   git.getStatus().then(r => {
+//     core.info("Status: "+r.current)
+//   })
+// }
 run();
 
 

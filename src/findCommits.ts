@@ -2,7 +2,7 @@ import {context} from '@actions/github'
 import * as core from '@actions/core'
 import {UpdatedCommits} from './DTO/updated-commits'
 import * as Context from '@actions/github/lib/context'
-import { StatusResult } from "simple-git";
+import {StatusResult} from 'simple-git'
 
 export class FindCommits {
   find(ctx: Context.Context, status: StatusResult): UpdatedCommits | null {
