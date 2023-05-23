@@ -18,6 +18,8 @@ jobs:
         uses: ./ # vgpastor/monorepo-updated-packages@v1.0
         with:
           folder: example/sourceTest
+      - name: Debug
+        run: echo ${{ steps.monorepo-packages.outputs.packages }}
   exec:
     needs: [ setup ]
     runs-on: ubuntu-latest
