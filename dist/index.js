@@ -255,6 +255,7 @@ const git = new git_client_1.GitClient();
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            yield git.fetchAll();
             const status = yield git.getStatus();
             core.debug(`GIT STATUS: ${JSON.stringify(status)}`);
             const updatedCommits = findCommits.find(github_1.context, status);
@@ -264,14 +265,13 @@ function run() {
             }
             core.info(`base: ${updatedCommits.base}`);
             core.info(`head: ${updatedCommits.head}`);
-            yield git.fetchAll();
-            yield git.createBranch('testDiff', updatedCommits.base, true);
+            // await git.createBranch('testDiff', updatedCommits.base, true)
             //git branch testDiff updatedCommits.head
             //git diff --name-only testDiff updatedCommits.base
             if (core.isDebug()) {
                 core.debug('Git status');
             }
-            const listOfFilesUpdated = yield git.getDiff('testDiff', updatedCommits.head);
+            const listOfFilesUpdated = yield git.getDiff(updatedCommits.base, updatedCommits.head);
             core.info(`files updated: ${listOfFilesUpdated.length}`);
             for (const file of listOfFilesUpdated) {
                 core.debug(`file updated: ${file}`);

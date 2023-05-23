@@ -9,6 +9,8 @@ const git = new GitClient()
 
 async function run(): Promise<void> {
   try {
+    await git.fetchAll()
+
     const status = await git.getStatus()
     core.debug(`GIT STATUS: ${JSON.stringify(status)}`)
 
@@ -21,9 +23,7 @@ async function run(): Promise<void> {
     core.info(`base: ${updatedCommits.base}`)
     core.info(`head: ${updatedCommits.head}`)
 
-    await git.fetchAll()
-
-    await git.createBranch('testDiff', updatedCommits.base, true)
+    // await git.createBranch('testDiff', updatedCommits.base, true)
 
     //git branch testDiff updatedCommits.head
     //git diff --name-only testDiff updatedCommits.base
@@ -33,7 +33,7 @@ async function run(): Promise<void> {
     }
 
     const listOfFilesUpdated = await git.getDiff(
-      'testDiff',
+      updatedCommits.base,
       updatedCommits.head
     )
 
