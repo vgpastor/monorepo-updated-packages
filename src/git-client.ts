@@ -35,7 +35,7 @@ class GitClient {
   }
 
   async fetchAll(): Promise<void> {
-    await this.git.raw(['fetch'], err => {
+    await this.git.raw(['fetch', '--all'], err => {
       if (err) {
         core.error(err.message)
       }
@@ -61,6 +61,29 @@ class GitClient {
   async getDiff(base: string, head: string): Promise<string[]> {
     const out = await this.git.diffSummary(['--name-only', base, head])
     return this.flatOutputDiff(out)
+  }
+
+  async createBranch(
+    branchName: string,
+    base: string,
+    force: boolean
+  ): Promise<void> {
+    if (force) {
+      //Delete branch
+      await this.git.raw(['branch', '-D', branchName], (err, result) => {
+        if (err) {
+          core.error(err.message)
+        }
+        core.info(`Branch deleted: ${result}`)
+      })
+    }
+
+    await this.git.raw(['branch', branchName, base], (err, result) => {
+      if (err) {
+        core.error(err.message)
+      }
+      core.info(`Branch created: ${result}`)
+    })
   }
 
   private flatOutputDiff(result: simpleGit.DiffResult): string[] {

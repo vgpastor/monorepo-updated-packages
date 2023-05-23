@@ -1,44 +1,41 @@
 import * as core from '@actions/core'
 import {context} from '@actions/github'
 import {GitClient} from './git-client'
+import {FindCommits} from './findCommits'
+import {json} from 'stream/consumers'
+
+const findCommits = new FindCommits()
+const git = new GitClient()
+
 async function run(): Promise<void> {
   try {
-    core.info('Action runs')
-    core.debug('Action runs DEBUG')
+    await git.fetchAll()
 
-    let base = ''
-    let head = ''
+    const status = await git.getStatus()
+    core.debug(`GIT STATUS: ${JSON.stringify(status)}`)
 
-    core.info(`Action runs ${context.eventName}`)
-    switch (context.eventName) {
-      case 'pull_request':
-        base = context.payload.pull_request?.base?.sha
-        head = context.payload.pull_request?.head?.sha
-        break
-      case 'push':
-        base = context.payload.before
-        head = context.payload.after
-        break
-      default:
-        core.setFailed(
-          `This action only supports pull requests and pushes, ${context.eventName} events are not supported. ` +
-            "Please submit an issue on this action's GitHub repo if you believe this in correct."
-        )
-        return
+    const updatedCommits = findCommits.find(context, status)
+    if (updatedCommits == null) {
+      core.error('No updated commits found')
+      return
     }
 
-    const git = new GitClient()
-    await git.fetchAll()
+    core.info(`base: ${updatedCommits.base}`)
+    core.info(`head: ${updatedCommits.head}`)
+
+    // await git.createBranch('testDiff', updatedCommits.base, true)
+
+    //git branch testDiff updatedCommits.head
+    //git diff --name-only testDiff updatedCommits.base
 
     if (core.isDebug()) {
       core.debug('Git status')
-      await git.getStatus()
     }
 
-    core.info(`base: ${base}`)
-    core.info(`head: ${head}`)
-
-    const listOfFilesUpdated = await git.getDiff(base, head)
+    const listOfFilesUpdated = await git.getDiff(
+      updatedCommits.base,
+      updatedCommits.head
+    )
 
     core.info(`files updated: ${listOfFilesUpdated.length}`)
     for (const file of listOfFilesUpdated) {
@@ -85,5 +82,12 @@ function extractProjectFromFiles(
 function cleanProjectsPathEndSlash(path: string): string {
   return path.endsWith('/') ? path : `${path}/`
 }
+
+// if (core.isDebug()) {
+//   core.debug('Git status')
+//   git.getStatus().then(r => {
+//     core.info("Status: "+r.current)
+//   })
+// }
 
 run()
