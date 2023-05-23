@@ -5,6 +5,7 @@
   "description": "Monorepos projects modified detector based in Git",
   "main": "lib/main.js",
   "scripts": {
+    "run": "ts-node src/main.ts",
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
