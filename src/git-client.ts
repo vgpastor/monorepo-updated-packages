@@ -35,7 +35,7 @@ class GitClient {
   }
 
   async fetchAll(): Promise<void> {
-    await this.git.raw(['fetch', '-all'], err => {
+    await this.git.raw(['fetch', '--all'], err => {
       if (err) {
         core.error(err.message)
       }
