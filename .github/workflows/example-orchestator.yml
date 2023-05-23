@@ -19,11 +19,14 @@ jobs:
         with:
           folder: example/sourceTest
       - name: Debug
-        run: echo ${{ steps.monorepo-packages.outputs.packages }}
+        run: |
+          echo ${{ steps.monorepo-packages.outputs.packages }}          
+          echo ${{ fromJson(steps.monorepo-packages.outputs.packages) }}
+          echo ${{ fromJson(steps.monorepo-packages.outputs.packages) | length }}
   exec:
     needs: [ setup ]
     runs-on: ubuntu-latest
-    if: ${{ needs.setup.outputs.packages != '{}' }}
+    if: ${{ fromJson(needs.setup.outputs.packages) | length > 0 }}
     strategy:
       matrix:
         project: ${{ fromJson(needs.setup.outputs.packages) }}
