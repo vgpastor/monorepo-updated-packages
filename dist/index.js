@@ -144,7 +144,7 @@ class GitClient {
     }
     fetchAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.git.raw(['fetch', '--all'], err => {
+            yield this.git.raw(['fetch', '--unshallow'], err => {
                 if (err) {
                     core.error(err.message);
                 }
