@@ -20,10 +20,6 @@ jobs:
           folder: example/sourceTest
       - name: Debug
         run: echo ${{ steps.monorepo-packages.outputs.packages }}
-      - name: Output
-        run: echo ${{ fromJson(steps.monorepo-packages.outputs.packages) }}
-      - name: Number of packages
-        run: echo ${{ fromJson(steps.monorepo-packages.outputs.packages)[@] }}
 
   exec:
     needs: [ setup ]
