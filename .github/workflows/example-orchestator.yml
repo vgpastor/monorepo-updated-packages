@@ -28,7 +28,7 @@ jobs:
   exec:
     needs: [ setup ]
     runs-on: ubuntu-latest
-    if: ${{ fromJson(needs.setup.outputs.packages) | length > 0 }}
+    if: ${{ needs.setup.outputs.packages != '[]' }}
     strategy:
       matrix:
         project: ${{ fromJson(needs.setup.outputs.packages) }}
