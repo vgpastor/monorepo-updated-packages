@@ -23,7 +23,7 @@ jobs:
       - name: Output
         run: echo ${{ fromJson(steps.monorepo-packages.outputs.packages) }}
       - name: Number of packages
-        run: echo ${{ fromJson(steps.monorepo-packages.outputs.packages).length }}
+        run: echo ${{ ${#fromJson(steps.monorepo-packages.outputs.packages)[@]} }}
 
   exec:
     needs: [ setup ]
